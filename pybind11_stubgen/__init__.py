@@ -740,8 +740,13 @@ class ClassStubsGenerator(StubsGenerator):
                 continue
             if name.startswith("__pybind11_module"):
                 continue
-            if (inspect.isroutine(member) or inspect.isclass(member)) and name != member.__name__:
-                self.alias.append(AliasStubsGenerator(name, member))
+            if (inspect.isroutine(member) or inspect.isclass(member)):
+                try:
+                    attr_name = member.__name__
+                except AttributeError:
+                    attr_name = None
+                if name != attr_name:
+                    self.alias.append(AliasStubsGenerator(name, member))
             elif inspect.isroutine(member):
                 self.methods.append(
                     ClassMemberStubsGenerator(name, member, self.klass.__module__)
